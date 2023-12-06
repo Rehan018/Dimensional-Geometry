@@ -1,0 +1,89 @@
+<!-- For the given curve: y = 5x – 2x3, when x increases at the rate of 2 units/sec, then how fast is the slope of curve changes when x = 3? -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Curve Visualization</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="https://threejs.org/build/three.js"></script>
+  <script>
+    // Function to define the curve y = 5x - 2x^3
+    function curveFunction(x) {
+      return 5 * x - 2 * Math.pow(x, 3);
+    }
+
+    // Function to calculate the derivative dy/dx
+    function derivativeFunction(x) {
+      return 5 - 6 * Math.pow(x, 2);
+    }
+
+    // Set up the scene
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Create a curve geometry
+    const curveGeometry = new THREE.BufferGeometry();
+    const curveMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+    const curvePoints = [];
+
+    for (let x = -5; x <= 5; x += 0.1) {
+      curvePoints.push(new THREE.Vector3(x, curveFunction(x), 0));
+    }
+
+    curveGeometry.setFromPoints(curvePoints);
+    const curve = new THREE.Line(curveGeometry, curveMaterial);
+    scene.add(curve);
+
+    // Create a tangent line geometry
+    const tangentGeometry = new THREE.BufferGeometry();
+    const tangentMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const tangentPoints = [];
+
+    const xValue = 3; // Specific x value
+    const yValue = curveFunction(xValue);
+    const slope = derivativeFunction(xValue);
+    const tangentLength = 2;
+
+    tangentPoints.push(new THREE.Vector3(xValue - tangentLength / 2, yValue - slope * tangentLength / 2, 0));
+    tangentPoints.push(new THREE.Vector3(xValue + tangentLength / 2, yValue + slope * tangentLength / 2, 0));
+
+    tangentGeometry.setFromPoints(tangentPoints);
+    const tangentLine = new THREE.Line(tangentGeometry, tangentMaterial);
+    scene.add(tangentLine);
+
+    camera.position.z = 10;
+
+    // Animation
+    const animate = function () {
+      requestAnimationFrame(animate);
+
+      curve.rotation.x += 0.01;
+      curve.rotation.y += 0.01;
+
+      renderer.render(scene, camera);
+    };
+
+    window.addEventListener('resize', function () {
+      const newWidth = window.innerWidth;
+      const newHeight = window.innerHeight;
+
+      camera.aspect = newWidth / newHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(newWidth, newHeight);
+    });
+
+    animate();
+  </script>
+</body>
+</html>
