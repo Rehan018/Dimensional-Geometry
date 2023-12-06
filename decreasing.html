@@ -1,0 +1,88 @@
+<!-- Show that the function f(x) = tan x – 4x is strictly decreasing on [-π/3, π/3] -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Function and Derivative Visualization</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="https://threejs.org/build/three.js"></script>
+  <script>
+    // Function to define the function f(x) = tan(x) - 4x
+    function f(x) {
+      return Math.tan(x) - 4 * x;
+    }
+
+    // Function to define the derivative f'(x)
+    function derivative(x) {
+      return Math.pow(1 / Math.cos(x), 2) - 4;
+    }
+
+    // Set up the scene
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Create a curve geometry for f(x)
+    const curveGeometry = new THREE.BufferGeometry();
+    const curveMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+    const curvePoints = [];
+
+    for (let x = -Math.PI / 3; x <= Math.PI / 3; x += 0.1) {
+      curvePoints.push(new THREE.Vector3(x, f(x), 0));
+    }
+
+    curveGeometry.setFromPoints(curvePoints);
+    const curve = new THREE.Line(curveGeometry, curveMaterial);
+    scene.add(curve);
+
+    // Create a curve geometry for f'(x)
+    const derivativeGeometry = new THREE.BufferGeometry();
+    const derivativeMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const derivativePoints = [];
+
+    for (let x = -Math.PI / 3; x <= Math.PI / 3; x += 0.1) {
+      derivativePoints.push(new THREE.Vector3(x, derivative(x), 0));
+    }
+
+    derivativeGeometry.setFromPoints(derivativePoints);
+    const derivativeCurve = new THREE.Line(derivativeGeometry, derivativeMaterial);
+    scene.add(derivativeCurve);
+
+    camera.position.z = 10;
+
+    // Animation
+    const animate = function () {
+      requestAnimationFrame(animate);
+
+      // Rotate the curves (optional)
+      curve.rotation.x += 0.01;
+      curve.rotation.y += 0.01;
+      derivativeCurve.rotation.x += 0.01;
+      derivativeCurve.rotation.y += 0.01;
+
+      renderer.render(scene, camera);
+    };
+
+    // Handle window resize
+    window.addEventListener('resize', function () {
+      const newWidth = window.innerWidth;
+      const newHeight = window.innerHeight;
+
+      camera.aspect = newWidth / newHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(newWidth, newHeight);
+    });
+
+    animate();
+  </script>
+</body>
+</html>
