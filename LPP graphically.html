@@ -1,0 +1,73 @@
+<!-- Solve the following LPP graphically: Maximise Z = 2x + 3y, subject to x + y ≤ 4, x ≥ 0, y ≥ 0 -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Linear Programming Animation</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="https://threejs.org/build/three.js"></script>
+  <script>
+    // Set up the scene
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+
+    const gridHelper = new THREE.GridHelper(10, 10);
+    scene.add(gridHelper);
+
+
+    const axesHelper = new THREE.AxesHelper(5);
+    scene.add(axesHelper);
+
+
+    const planeGeometry = new THREE.PlaneGeometry(5, 5);
+    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x7fc8a9, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.rotation.x = Math.PI / 2; 
+    scene.add(plane);
+
+    const coneGeometry = new THREE.ConeGeometry(1, 2, 32);
+    const coneMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.7 });
+    const cone = new THREE.Mesh(coneGeometry, coneMaterial);
+    scene.add(cone);
+
+    camera.position.z = 5;
+
+    // Animation
+    const animate = function () {
+      requestAnimationFrame(animate);
+
+      const time = Date.now() * 0.001; 
+      const x = Math.sin(time);
+      const y = Math.cos(time);
+
+      cone.position.set(x, y, 0);
+
+      renderer.render(scene, camera);
+    };
+
+    // Handle window resize
+    window.addEventListener('resize', function () {
+      const newWidth = window.innerWidth;
+      const newHeight = window.innerHeight;
+
+      camera.aspect = newWidth / newHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(newWidth, newHeight);
+    });
+
+    animate();
+  </script>
+</body>
+</html>
