@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kadane's Algorithm Visualizer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    #arrayInput {
+      margin-top: 20px;
+    }
+    #arrayContainer {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .array-element {
+      width: 40px;
+      height: 40px;
+      background-color: #ddd;
+      border: 1px solid #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 5px;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    #steps {
+      margin-top: 20px;
+      font-style: italic;
+      color: #555;
+      overflow: hidden;
+    }
+    .step {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+    .step.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #subarrayIndices {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Kadane's Algorithm Visualizer</h1>
+
+<label for="arrayInput">Enter array (comma-separated):</label>
+<input type="text" id="arrayInput" placeholder="1, -2, 3, -1, 2">
+<button onclick="visualizeKadane()">Visualize</button>
+
+<div id="arrayContainer"></div>
+<div id="result"></div>
+<div id="steps" class="step-container"></div>
+<div id="subarrayIndices"></div>
+
+<script>
+  function visualizeKadane() {
+    const arrayInput = document.getElementById('arrayInput');
+    const arrayContainer = document.getElementById('arrayContainer');
+    const resultDiv = document.getElementById('result');
+    const stepsDiv = document.getElementById('steps');
+    const subarrayIndicesDiv = document.getElementById('subarrayIndices');
+
+    const inputArray = arrayInput.value.split(',').map(str => parseInt(str.trim()));
+    const n = inputArray.length;
+
+    // Display the input array
+    arrayContainer.innerHTML = inputArray.map((val, index) => `<div class="array-element" id="element${index}">${val}</div>`).join('');
+
+    // Call Kadane's algorithm
+    const { maxSum, maxStart, maxEnd, steps } = kadanesAlgorithm(inputArray, n);
+
+    resultDiv.innerHTML = `<p>Maximum subarray sum: ${maxSum}</p>`;
+
+    // Display steps with animation
+    stepsDiv.innerHTML = steps.map((step, index) => `<p class="step" id="step${index}">${step}</p>`).join('');
+
+    // Display subarray indices
+    subarrayIndicesDiv.innerHTML = `<p>Maximum subarray indices: ${maxStart} to ${maxEnd}</p>`;
+
+    // Highlight the maximum subarray in the array visualization
+    highlightSubarray(maxStart, maxEnd);
+    
+    // Trigger animation
+    animateSteps();
+  }
+
+  function kadanesAlgorithm(arr, n) {
+    let currentSum = arr[0];
+    let maxSum = arr[0];
+    let maxStart = 0;
+    let maxEnd = 0;
+    const steps = [];
+
+    steps.push(`Initial sum: ${currentSum}`);
+
+    for (let i = 1; i < n; ++i) {
+      if (arr[i] > currentSum + arr[i]) {
+        currentSum = arr[i];
+        steps.push(`Start new subarray from ${arr[i]}`);
+      } else {
+        currentSum += arr[i];
+        steps.push(`Add ${arr[i]} to the current sum`);
+      }
+
+      if (currentSum > maxSum) {
+        maxSum = currentSum;
+        maxEnd = i;
+        steps.push(`Update maximum sum to ${maxSum}`);
+      }
+    }
+
+    return { maxSum, maxStart, maxEnd, steps };
+  }
+
+  function highlightSubarray(start, end) {
+    for (let i = start; i <= end; ++i) {
+      const element = document.getElementById(`element${i}`);
+      element.style.backgroundColor = '#8ED081'; // Highlight color
+    }
+  }
+
+  function animateSteps() {
+    const stepElements = document.querySelectorAll('.step');
+    stepElements.forEach((step, index) => {
+      setTimeout(() => {
+        step.classList.add('active');
+      }, index * 1000); // Delay each step by 1000ms (1 second)
+    });
+  }
+</script>
+
+</body>
+</html>
