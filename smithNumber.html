@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smith Number Visualizer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    #steps {
+      margin-top: 20px;
+      font-style: italic;
+      color: #555;
+      overflow: hidden;
+    }
+    .step {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+    .step.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<h1>Smith Number Visualizer</h1>
+
+<label for="numberInput">Enter a number:</label>
+<input type="number" id="numberInput" min="0">
+<button onclick="visualizeSmithNumber()">Visualize</button>
+
+<div id="result"></div>
+<div id="steps" class="step-container"></div>
+
+<script>
+  function visualizeSmithNumber() {
+    const numberInput = document.getElementById('numberInput');
+    const resultDiv = document.getElementById('result');
+    const stepsDiv = document.getElementById('steps');
+    const number = parseInt(numberInput.value);
+
+    if (isNaN(number) || number < 0) {
+      resultDiv.innerHTML = '<p>Please enter a valid non-negative number.</p>';
+      return;
+    }
+
+    const { isSmithNumber, steps } = checkSmithNumber(number);
+
+    resultDiv.innerHTML = `<p>${number} is ${isSmithNumber ? '' : 'not '}a Smith Number.</p>`;
+
+    // Display steps with animation
+    stepsDiv.innerHTML = steps.map((step, index) => `<p class="step" id="step${index}">${step}</p>`).join('');
+
+    // Trigger animation
+    animateSteps();
+  }
+
+  function checkSmithNumber(n) {
+    let sum = 0;
+    let num = n;
+    const primes = [];
+    const steps = [];
+
+    steps.push(`Original number: ${n}`);
+
+    for (let i = 2; i < n; i++) {
+      while (num % i === 0) {
+        primes.push(i);
+        num /= i;
+        steps.push(`Divide by prime factor ${i}: ${num}`);
+      }
+    }
+
+    num = 0;
+    while (n) {
+      const digit = n % 10;
+      num += digit;
+      n = Math.floor(n / 10);
+    }
+
+    steps.push(`Sum of digits: ${num}`);
+
+    for (let i = 0; i < primes.length; i++) {
+      while (primes[i]) {
+        const digit = primes[i] % 10;
+        sum += digit;
+        primes[i] = Math.floor(primes[i] / 10);
+        steps.push(`Sum of prime factors: ${sum}`);
+      }
+    }
+
+    return { isSmithNumber: num === sum, steps };
+  }
+
+  function animateSteps() {
+    const stepElements = document.querySelectorAll('.step');
+    stepElements.forEach((step, index) => {
+      setTimeout(() => {
+        step.classList.add('active');
+      }, index * 1000); // Delay each step by 1000ms (1 second)
+    });
+  }
+</script>
+
+</body>
+</html>
